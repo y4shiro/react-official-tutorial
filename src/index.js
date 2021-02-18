@@ -126,7 +126,8 @@ class Game extends React.Component {
 
     let status;
     if (winner) {
-      status = "Winner: " + winner.name;
+      // ドローの場合は引き分けの文言を表示、勝者がいる場合は勝者の名前を表示
+      status = winner.isDraw ? "引き分けです" : "Winner: " + winner.name;
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
@@ -168,14 +169,23 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6]
   ];
+
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return {
+        isDraw: false,
         name: squares[a],
         line: lines[i]
       };
     }
+  }
+  if (!squares.includes(null)) { // squares にマス目の空き(null)がなくなった場合、isDraw: true を返す
+    return {
+      isDraw: true,
+      name: null,
+      line: null
+    };
   }
   return null;
 }
