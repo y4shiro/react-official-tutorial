@@ -58,7 +58,8 @@ class Game extends React.Component {
         }
       ],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      isAscSort: true
     };
   }
 
@@ -90,6 +91,12 @@ class Game extends React.Component {
     });
   }
 
+  toggleAscSort() {
+    this.setState({
+      isAscSort: !this.state.isAscSort
+    });
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -118,6 +125,9 @@ class Game extends React.Component {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
+    // state の値に応じて moves の並び順を反転
+    if (!this.state.isAscSort) moves.reverse();
+
     return (
       <div className="game">
         <div className="game-board">
@@ -128,6 +138,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <button onClick={() => this.toggleAscSort()}>着手の並び順入れ替え</button>
           <ol>{moves}</ol>
         </div>
       </div>
