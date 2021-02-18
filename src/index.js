@@ -4,19 +4,23 @@ import './index.css';
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+      className={`square ${props.isHighLight ? 'highlight' : ''}`}
+      onClick={props.onClick}
+    >
       {props.value}
     </button>
   );
 }
 
 class Board extends React.Component {
-  renderSquare(i) {
+  renderSquare(i, isHighLight = false) {
     return (
       <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
         key={i}
+        isHighLight={isHighLight}
       />
     );
   }
@@ -25,11 +29,13 @@ class Board extends React.Component {
     const cols = 3; // 縦の列数
     const rows = 3; // 横の行数
     const boardElements = [];
+    const highLightSquares = this.props.highLight ?? [];
 
     for (let i = 0; i < rows; i++) {
       const rowElemnts = [];
       for (let j = 0; j < cols; j++) {
-        rowElemnts.push(this.renderSquare(j + (i * 3)));
+        const isHighLight = highLightSquares.includes(j + (i * 3))
+        rowElemnts.push(this.renderSquare(j + (i * 3), isHighLight));
       }
       boardElements.push(
         <div className="board-row" key={i}>
@@ -120,7 +126,7 @@ class Game extends React.Component {
 
     let status;
     if (winner) {
-      status = "Winner: " + winner;
+      status = "Winner: " + winner.name;
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
@@ -134,6 +140,7 @@ class Game extends React.Component {
           <Board
             squares={current.squares}
             onClick={i => this.handleClick(i)}
+            highLight={winner ? winner.line : null}
           />
         </div>
         <div className="game-info">
@@ -164,7 +171,10 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {
+        name: squares[a],
+        line: lines[i]
+      };
     }
   }
   return null;
